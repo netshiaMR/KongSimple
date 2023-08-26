@@ -4,6 +4,15 @@ sqlalchemy
 databases
 
 
+import sqlalchemy
+
+DATABASE_URL = "sqlite:///../db/test.db"
+
+engine = sqlalchemy.create_engine(
+    DATABASE_URL, connect_args={"check_same_thread": False}
+)
+SessionLocal = sqlalchemy.orm.sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
 
 from sqlalchemy import create_engine, MetaData
 
