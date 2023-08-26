@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "C:\Users\F5505682\git\kongssdfnb\customer-service\app\main.py", line 3, in <module>    
+    from database import metadata, engine, DATABASE_URL
+  File "C:\Users\F5505682\git\kongssdfnb\customer-service\app\database.py", line 8, in <module>
+    SessionLocal = sqlalchemy.orm.sessionmaker(autocommit=False, autoflush=False, bind=engine) 
+                   ^^^^^^^^^^^^^^
+AttributeError: module 'sqlalchemy' has no attribute 'orm'. Did you mean: 'or_'?
