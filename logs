@@ -78,3 +78,37 @@ for CERT_FILE in $CERT_DIR/*.cer; do
     echo "File: $CERT_FILE is not a valid DER-encoded certificate"
   fi
 done
+
+
+
+
+
+
+#!/bin/bash
+
+# Path to directory containing .cer files
+CERT_DIR="/path/to/certificates"
+
+# Iterate over each .cer file in the directory
+for CERT_FILE in $CERT_DIR/*.cer; do
+  # Try reading as DER first
+  SUBJECT=$(openssl x509 -inform der -in $CERT_FILE -subject -noout 2>/dev/null)
+
+  if [ $? -eq 0 ]; then
+    # DER format successful
+    ALIAS=$(echo $SUBJECT | sed 's/.*CN=\([^,/]*\).*/\1/')
+    echo "File: $CERT_FILE, Alias: $ALIAS (DER format)"
+  else
+    # Try reading as PEM
+    SUBJECT=$(openssl x509 -inform pem -in $CERT_FILE -subject -noout 2>/dev/null)
+    
+    if [ $? -eq 0 ]; then
+      # PEM format successful
+      ALIAS=$(echo $SUBJECT | sed 's/.*CN=\([^,/]*\).*/\1/')
+      echo "File: $CERT_FILE, Alias: $ALIAS (PEM format)"
+    else
+      # Invalid certificate
+      echo "File: $CERT_FILE is not a valid certificate in DER or PEM format"
+    fi
+  fi
+done
