@@ -1,0 +1,45 @@
+import os
+import subprocess
+
+# Directory containing .crt files
+cert_dir = "/path/to/certificates"
+
+# Path to the custom Java truststore
+truststore_path = "/path/to/custom_truststore.jks"
+
+# Password for the custom Java truststore
+truststore_password = "your_password"
+
+# Create a new empty truststore
+subprocess.run([
+    "keytool", "-genkey", "-keyalg", "RSA", "-alias", "dummy",
+    "-keystore", truststore_path,
+    "-storepass", truststore_password,
+    "-noprompt", "-dname", "CN=dummy, OU=dummy, O=dummy, L=dummy, S=dummy, C=US"
+], check=True)
+
+# Delete the dummy entry
+subprocess.run([
+    "keytool", "-delete", "-alias", "dummy",
+    "-keystore", truststore_path,
+    "-storepass", truststore_password
+], check=True)
+
+# Loop through each .crt file in the directory
+for filename in os.listdir(cert_dir):
+    if filename.endswith(".crt"):
+        crt_file_path = os.path.join(cert_dir, filename)
+
+        # Alias for each certificate in the truststore, based on the filename
+        alias = filename.replace('.crt', '')
+
+        # Import the certificate into the custom Java truststore
+        subprocess.run([
+            "keytool", "-import", "-noprompt", "-trustcacerts",
+            "-file", crt_file_path,
+            "-alias", alias,
+            "-keystore", truststore_path,
+            "-storepass", truststore_password
+        ], check=True)
+
+print(f"All .crt files from {cert_dir} have been imported into {truststore_path}")
