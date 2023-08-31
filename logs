@@ -32,3 +32,25 @@ RUN rm -rf /var/lib/apt/lists/* \
 
 # Set the default command to run your application (if any)
 # CMD ["your-command-here"]
+
+
+
+#!/bin/bash
+
+# Define the directory containing the .cer files
+CERT_DIR="/path/to/certificates"
+
+# Define the truststore location and its password
+TRUSTSTORE_PATH="path_to_client-truststore.jks"
+TRUSTSTORE_PASS="your_truststore_password"
+
+# Iterate over each .cer file in the directory and import it
+for CERT_FILE in $CERT_DIR/*.cer
+do
+  # Generate an alias from the certificate file name
+  ALIAS=$(basename -- "$CERT_FILE")
+  ALIAS="${ALIAS%.*}"
+
+  # Import the certificate into the truststore
+  keytool -import -file $CERT_FILE -alias $ALIAS -keystore $TRUSTSTORE_PATH -storepass $TRUSTSTORE_PASS -noprompt
+done
