@@ -54,3 +54,27 @@ do
   # Import the certificate into the truststore
   keytool -import -file $CERT_FILE -alias $ALIAS -keystore $TRUSTSTORE_PATH -storepass $TRUSTSTORE_PASS -noprompt
 done
+
+
+
+
+
+#!/bin/bash
+
+# Path to directory containing .cer files
+CERT_DIR="/path/to/certificates"
+
+# Iterate over each .cer file in the directory
+for CERT_FILE in $CERT_DIR/*.cer; do
+  # Extract the subject field from the certificate
+  SUBJECT=$(openssl x509 -inform der -in $CERT_FILE -subject -noout 2>/dev/null)
+
+  # Check if the openssl command was successful
+  if [ $? -eq 0 ]; then
+    # Generate an alias name based on the subject field
+    ALIAS=$(echo $SUBJECT | sed 's/.*CN=\([^,/]*\).*/\1/')
+    echo "File: $CERT_FILE, Alias: $ALIAS"
+  else
+    echo "File: $CERT_FILE is not a valid DER-encoded certificate"
+  fi
+done
