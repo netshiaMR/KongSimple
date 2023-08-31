@@ -112,3 +112,35 @@ for CERT_FILE in $CERT_DIR/*.cer; do
     fi
   fi
 done
+
+
+
+
+
+#!/bin/bash
+
+# Define the directory containing the .cer files
+CERT_DIR="/path/to/certificates"
+
+# Iterate over each .cer file in the directory
+for CER_FILE in $CERT_DIR/*.cer; do
+  # Generate a name for the .crt file based on the .cer file name
+  CRT_FILE="${CER_FILE%.cer}.crt"
+  
+  # Convert the .cer file to .crt format
+  openssl x509 -inform der -in $CER_FILE -out $CRT_FILE 2>/dev/null
+
+  # Check if the openssl command was successful
+  if [ $? -eq 0 ]; then
+    echo "Converted: $CER_FILE to $CRT_FILE"
+  else
+    # Try converting assuming it's PEM format
+    openssl x509 -inform pem -in $CER_FILE -out $CRT_FILE 2>/dev/null
+
+    if [ $? -eq 0 ]; then
+      echo "Converted (PEM): $CER_FILE to $CRT_FILE"
+    else
+      echo "Failed to convert: $CER_FILE"
+    fi
+  fi
+done
